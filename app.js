@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function fetchHistoricalRates() {
         const baseCurrency = baseCurrencySelect.value;
         const targetCurrency = targetCurrencySelect.value;
-        const date = '2021-01-01'; // Example date, can be dynamic or user-selected
-
+        const date = '2021-01-01'; 
+        
         if (!baseCurrency || !targetCurrency) {
             historicalRatesContainer.textContent = 'Please select both currencies';
             return;
@@ -82,10 +82,18 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(`${historicalURL}?date=${date}&base_currency=${baseCurrency}&target_currency=${targetCurrency}`, requestOptions)
             .then(response => response.json())
             .then(data => {
-                const rate = data.data[targetCurrency];
+             
+            const dateKey = Object.keys(data.data)[0];
+            if (data.data && data.data[dateKey] && data.data[dateKey][targetCurrency]) {
+                const rate = data.data[dateKey][targetCurrency];
                 historicalRatesContainer.textContent = `Historical exchange rate on ${date}: 1 ${baseCurrency} = ${rate} ${targetCurrency}`;
-            })
-            .catch(error => console.error('Error fetching historical rates:', error));
+                  //converterContainer.classList.add('expanded'); // Expand the container
+            } else {
+                historicalRatesContainer.textContent = 'Historical exchange rate not available';
+            }
+        })    
+
+        .catch(error => console.error('Error fetching historical rates:', error));
     }
 
     // Event listener for saving favorite currency pairs
